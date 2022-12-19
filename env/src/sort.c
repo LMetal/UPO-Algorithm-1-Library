@@ -27,8 +27,8 @@
 #include <string.h>
 
 void swap(void * val1P, void * val2P, size_t size){
-    void *e = malloc(size);
     if(val1P == val2P) return;
+    void *e = malloc(size);
     memcpy(e, val1P, size);
     memcpy(val1P, val2P, size);
     memcpy(val2P, e, size);
@@ -93,7 +93,7 @@ void upo_merge_sort(void *base, size_t n, size_t size, upo_sort_comparator_t cmp
     upo_merge((char*)base, n1, n2, size, cmp);
 }
 
-/*int partition(void *base, size_t n, size_t size, upo_sort_comparator_t cmp){
+int partition(void *base, size_t n, size_t size, upo_sort_comparator_t cmp){
     void *pivot = base;
     size_t pivotPos = 0;
     swap(base, base+n/2*size, size);
@@ -104,18 +104,16 @@ void upo_merge_sort(void *base, size_t n, size_t size, upo_sort_comparator_t cmp
     }
     swap(pivot, base+pivotPos*size, size);
     return pivotPos;
-}*/
+}
 
 
 void upo_quick_sort(void *base, size_t n, size_t size, upo_sort_comparator_t cmp)
 {
-  printf("To be imp\n");
-  abort();
-  /*
+
   if(n <= 1) return;
   int q = partition(base, n, size, cmp);
-  int n1 = q-1;
-  int n2 = n-q-1;
+  int n1 = q;
+  int n2 = n-q;
   upo_quick_sort(base, n1, size, cmp);
-  upo_quick_sort(base+(q+1)*size, n2, size, cmp);*/
+  upo_quick_sort(base+q*size, n2, size, cmp);
 }
