@@ -160,7 +160,7 @@ int main()
 
     printf("Test case 'quick sort'... ");
     fflush(stdout);
-    //test_quick_sort();
+    test_quick_sort();
     printf("OK\n");
 
     return 0;
