@@ -77,12 +77,31 @@ void upo_bst_clear(upo_bst_t tree, int destroy_data)
     }
 }
 
+void* upo_bst_put_impl(upo_bst_node_t * root, void *key, void *value, void** vold,upo_bst_comparator_t key_cmp){
+    //*vold = NULL;
+
+    if(root == NULL){
+        upo_bst_node_t * newNode = malloc(sizeof(upo_bst_node_t));
+        newNode->value = value;
+        newNode->key=key;
+        return newNode;
+    }
+    if(key_cmp(key, root->key) < 0) root->left = upo_bst_put_impl(root->left, key, value, vold, key_cmp);
+
+    else if(key_cmp(key, root->key) > 0) root->right = upo_bst_put_impl(root->right, key, value, vold, key_cmp);
+
+    else{
+        *vold = root->value;
+        root->value = value;
+    }
+    return root;
+}
+
 void* upo_bst_put(upo_bst_t tree, void *key, void *value)
 {
-    /* TO STUDENTS:
-     *  Remove the following two lines and put here your implementation. */
-    fprintf(stderr, "To be implemented!\n");
-    abort();
+    void * vold;
+    tree->root = upo_bst_put_impl(tree->root, key, value, &vold, tree->key_cmp);
+    return vold;
 }
 
 void upo_bst_insert(upo_bst_t tree, void *key, void *value)
@@ -93,25 +112,29 @@ void upo_bst_insert(upo_bst_t tree, void *key, void *value)
     abort();
 }
 
-void* upo_bst_get_impl(const upo_bst_node_t root, const void *key, upo_bst_comparator_t key_cmp){
-    if(t == NULL) return NULL;
+void* upo_bst_get_impl(const upo_bst_node_t* root, const void *key, upo_bst_comparator_t key_cmp){
+    if(root == NULL) return NULL;
 
-    if(key){
-        upo_bst_get_impl(t->)
+    if(key_cmp(root->value, key) == 0){
+        return root->value;
+    } else{
+        if(key_cmp(root->value, key) < 0){
+            return upo_bst_get_impl(root->right, key, key_cmp);
+        } else{
+            return upo_bst_get_impl(root->left, key, key_cmp);
+        }
     }
 }
 
 void* upo_bst_get(const upo_bst_t tree, const void *key)
 {
-    return getImpl(tree->root, key, tree->key_cmp);
+    return upo_bst_get_impl(tree->root, key, tree->key_cmp);
 }
 
 int upo_bst_contains(const upo_bst_t tree, const void *key)
 {
-    /* TO STUDENTS:
-     *  Remove the following two lines and put here your implementation. */
-    fprintf(stderr, "To be implemented!\n");
-    abort();
+    if(upo_bst_get_impl(tree->root, key, tree->key_cmp) == NULL) return 0;
+    else return 1;
 }
 
 void upo_bst_delete(upo_bst_t tree, const void *key, int destroy_data)
