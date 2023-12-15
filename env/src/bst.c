@@ -77,104 +77,225 @@ void upo_bst_clear(upo_bst_t tree, int destroy_data)
     }
 }
 
-void* upo_bst_put_impl(upo_bst_node_t * root, void *key, void *value, void** vold,upo_bst_comparator_t key_cmp){
-    //*vold = NULL;
-
-    if(root == NULL){
-        upo_bst_node_t * newNode = malloc(sizeof(upo_bst_node_t));
-        newNode->value = value;
-        newNode->key=key;
-        return newNode;
+void* upo_bst_put_impl(upo_bst_node_t *node, void *key, void *value, void **old_value, upo_bst_comparator_t key_cmp) {
+    if (node == NULL) {
+        // Create a new node with the given key-value pair
+        upo_bst_node_t *new_node = malloc(sizeof(upo_bst_node_t));
+        if (new_node == NULL) {
+            perror("Unable to create a new node");
+            return NULL;
+        }
+        new_node->key = key;
+        new_node->value = value;
+        new_node->left = NULL;
+        new_node->right = NULL;
+        return new_node;
     }
-    if(key_cmp(key, root->key) < 0) root->left = upo_bst_put_impl(root->left, key, value, vold, key_cmp);
 
-    else if(key_cmp(key, root->key) > 0) root->right = upo_bst_put_impl(root->right, key, value, vold, key_cmp);
-
-    else{
-        *vold = root->value;
-        root->value = value;
+    int cmp = key_cmp(key, node->key);
+    if (cmp < 0) {
+        node->left = upo_bst_put_impl(node->left, key, value, old_value, key_cmp);
+    } else if (cmp > 0) {
+        node->right = upo_bst_put_impl(node->right, key, value, old_value, key_cmp);
+    } else {
+        *old_value = node->value;
+        node->value = value;
     }
-    return root;
+    return node;
 }
 
 void* upo_bst_put(upo_bst_t tree, void *key, void *value)
 {
-    void * vold;
-    tree->root = upo_bst_put_impl(tree->root, key, value, &vold, tree->key_cmp);
-    return vold;
+    if (tree == NULL || key == NULL) {
+        return NULL;
+    }
+
+    void *old_value = NULL;
+    tree->root = upo_bst_put_impl(tree->root, key, value, &old_value, tree->key_cmp);
+    return old_value;
+}
+
+upo_bst_node_t *upo_bst_insert_impl(upo_bst_node_t *node, void *key, void *value, upo_bst_comparator_t key_cmp) {
+    if (node == NULL) {
+        // Create a new node with the given key-value pair
+        upo_bst_node_t *new_node = malloc(sizeof(upo_bst_node_t));
+        if (new_node == NULL) {
+            perror("Unable to create a new node");
+            return NULL;
+        }
+        new_node->key = key;
+        new_node->value = value;
+        new_node->left = NULL;
+        new_node->right = NULL;
+        return new_node;
+    }
+
+    int cmp = key_cmp(key, node->key);
+    if (cmp < 0) {
+        node->left = upo_bst_insert_impl(node->left, key, value, key_cmp);
+    } else if (cmp > 0) {
+        node->right = upo_bst_insert_impl(node->right, key, value, key_cmp);
+    } else {
+        // Duplicate key: do nothing
+    }
+    return node;
 }
 
 void upo_bst_insert(upo_bst_t tree, void *key, void *value)
 {
-    /* TO STUDENTS:
-     *  Remove the following two lines and put here your implementation. */
-    fprintf(stderr, "To be implemented!\n");
-    abort();
+    if (tree == NULL || key == NULL) {
+        return;
+    }
+
+    tree->root = upo_bst_insert_impl(tree->root, key, value, tree->key_cmp);
 }
 
-void* upo_bst_get_impl(const upo_bst_node_t* root, const void *key, upo_bst_comparator_t key_cmp){
-    if(root == NULL) return NULL;
+upo_bst_node_t* upo_bst_get_impl(upo_bst_node_t *node, const void *key, upo_bst_comparator_t key_cmp) {
+    if (node == NULL) {
+        return NULL;
+    }
 
-    if(key_cmp(root->value, key) == 0){
-        return root->value;
-    } else{
-        if(key_cmp(root->value, key) < 0){
-            return upo_bst_get_impl(root->right, key, key_cmp);
-        } else{
-            return upo_bst_get_impl(root->left, key, key_cmp);
-        }
+    int cmp = key_cmp(key, node->key);
+    if (cmp < 0) {
+        return upo_bst_get_impl(node->left, key, key_cmp);
+    } else if (cmp > 0) {
+        return upo_bst_get_impl(node->right, key, key_cmp);
+    } else {
+        return node;  // Return the entire node
     }
 }
 
-void* upo_bst_get(const upo_bst_t tree, const void *key)
-{
-    return upo_bst_get_impl(tree->root, key, tree->key_cmp);
+void* upo_bst_get(const upo_bst_t tree, const void *key) {
+    if (tree == NULL || key == NULL) {
+        return NULL;
+    }
+
+    upo_bst_node_t *result = upo_bst_get_impl(tree->root, key, tree->key_cmp);
+    if (result != NULL) {
+        return result->value;
+    } else {
+        return NULL;
+    }
 }
 
 int upo_bst_contains(const upo_bst_t tree, const void *key)
 {
-    if(upo_bst_get_impl(tree->root, key, tree->key_cmp) == NULL) return 0;
-    else return 1;
+    if (tree == NULL || key == NULL) {
+        return 0;
+    }
+
+    void *result = upo_bst_get(tree, key);
+    if (result != NULL) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+
+upo_bst_node_t* upo_bst_delete_impl(upo_bst_node_t *node, const void *key, upo_bst_comparator_t key_cmp) {
+    if (node == NULL) {
+        return NULL;
+    }
+
+    int cmp = key_cmp(key, node->key);
+    if (cmp < 0) {
+        node->left = upo_bst_delete_impl(node->left, key, key_cmp);
+    } else if (cmp > 0) {
+        node->right = upo_bst_delete_impl(node->right, key, key_cmp);
+    } else {
+        if (node->left == NULL && node->right == NULL) {
+            free(node);
+            return NULL;
+        } else if (node->left != NULL && node->right != NULL) {
+            // Node has two children
+            // Replace node with its in-order successor
+            upo_bst_node_t *successor = node->right;
+            while (successor->left != NULL) {
+                successor = successor->left;
+            }
+            node->key = successor->key;
+            node->value = successor->value;
+            node->right = upo_bst_delete_impl(node->right, successor->key, key_cmp);
+        } else {
+            // Node has one child
+            upo_bst_node_t *temp = node;
+            if (node->left != NULL) {
+                node = node->left;
+            } else {
+                node = node->right;
+            }
+            free(temp);
+        }
+    }
+    return node;
 }
 
 void upo_bst_delete(upo_bst_t tree, const void *key, int destroy_data)
 {
-    /* TO STUDENTS:
-     *  Remove the following two lines and put here your implementation. */
-    fprintf(stderr, "To be implemented!\n");
-    abort();
+    if (tree == NULL || key == NULL) {
+        return;
+    }
+
+    tree->root = upo_bst_delete_impl(tree->root, key, tree->key_cmp);
 }
+
+size_t upo_bst_size_impl(upo_bst_node_t *tree){
+    if(tree == NULL) return 0;
+
+    return upo_bst_size_impl(tree->left) +  upo_bst_size_impl(tree->right) + 1;
+}
+
 
 size_t upo_bst_size(const upo_bst_t tree)
 {
-    /* TO STUDENTS:
-     *  Remove the following two lines and put here your implementation. */
-    fprintf(stderr, "To be implemented!\n");
-    abort();
+    if(tree == NULL) return 0;
+
+    return upo_bst_size_impl(tree->root);
+}
+
+int upo_bst_isleaf(upo_bst_node_t *node){
+    if(node->left==NULL && node->right==NULL) return 1;
+    else return 0;
+}
+
+size_t upo_bst_height_impl(upo_bst_node_t *node){
+    if(node == NULL || upo_bst_isleaf(node) == 1) return 0;
+
+    size_t h1 = upo_bst_height_impl(node->left);
+    size_t h2 = upo_bst_height_impl(node->right);
+
+    if(h1 > h2) return h1 + 1;
+    else return h2 + 1;
 }
 
 size_t upo_bst_height(const upo_bst_t tree)
 {
-    /* TO STUDENTS:
-     *  Remove the following two lines and put here your implementation. */
-    fprintf(stderr, "To be implemented!\n");
-    abort();
+    return upo_bst_height_impl(tree->root);
+}
+
+void upo_bst_traverse_in_order_impl(upo_bst_node_t *node, upo_bst_visitor_t visit, void *visit_context){
+    if(node == NULL) return;
+
+    upo_bst_traverse_in_order_impl(node->left, visit, visit_context);
+
+    visit(node->key, node->value, visit_context);
+
+    upo_bst_traverse_in_order_impl(node->right, visit, visit_context);
 }
 
 void upo_bst_traverse_in_order(const upo_bst_t tree, upo_bst_visitor_t visit, void *visit_context)
 {
-    /* TO STUDENTS:
-     *  Remove the following two lines and put here your implementation. */
-    fprintf(stderr, "To be implemented!\n");
-    abort();
+    upo_bst_traverse_in_order_impl(tree->root, visit, visit_context);
 }
 
 int upo_bst_is_empty(const upo_bst_t tree)
 {
-    /* TO STUDENTS:
-     *  Remove the following two lines and put here your implementation. */
-    fprintf(stderr, "To be implemented!\n");
-    abort();
+    if(tree == NULL) return 1;
+
+    if(tree->root == NULL) return 1;
+
+    return 0;
 }
 
 
