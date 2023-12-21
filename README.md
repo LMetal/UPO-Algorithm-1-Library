@@ -6,4 +6,7 @@ This includes
 - Stack
 
 Tests for every algorithm can be found in the test folder.
-Everything was tested with valgrind, therefore memory-leaks safe
+
+Everything was tested with valgrind, therefore memory-leaks safe.
+
+No warning occours when compiling with gcc and -Wall -Wextra flags.
