@@ -84,7 +84,7 @@ size_t upo_io_read_line(FILE *stream, char **lineptr, size_t *size)
             size_changed = 1;
         }
 
-        (*lineptr)[rd++] = ch;
+        (*lineptr)[rd++] = (char)ch;
 
         if (ch == '\n')
         {

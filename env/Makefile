@@ -1,7 +1,7 @@
 docpath=./doc/api
 
 #CFLAGS+=-Wall -Wextra -ansi -pedantic -g -I"$(PWD)/include"
-CFLAGS+=-Wall -Wextra -std=c11 -pedantic -g -I"$(PWD)/include"
+CFLAGS+=-Wall -Wextra -Wconversion -std=c11 -pedantic -g -I"$(PWD)/include"
 CFLAGS+=-fPIE
 #CFLAGS+=-DUPO_DEBUG
 #CFLAGS+=-DUPO_BST_USE_RECURSIVE_PUT

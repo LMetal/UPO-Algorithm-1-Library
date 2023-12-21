@@ -65,7 +65,7 @@ void do_something(long n)
 {
     while (n > 0)
     {
-        exp(sqrt(n));
+        exp(sqrt((double)n));
         --n;
     }
 }

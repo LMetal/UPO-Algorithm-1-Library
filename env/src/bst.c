@@ -193,19 +193,19 @@ int upo_bst_contains(const upo_bst_t tree, const void *key)
 }
 
 
-upo_bst_node_t* upo_bst_delete_impl(upo_bst_node_t *node, const void *key, upo_bst_comparator_t key_cmp) {
+upo_bst_node_t* upo_bst_delete_impl(upo_bst_node_t *node, const void *key, upo_bst_comparator_t key_cmp, int destroy_data) {
     if (node == NULL) {
         return NULL;
     }
 
     int cmp = key_cmp(key, node->key);
     if (cmp < 0) {
-        node->left = upo_bst_delete_impl(node->left, key, key_cmp);
+        node->left = upo_bst_delete_impl(node->left, key, key_cmp, destroy_data);
     } else if (cmp > 0) {
-        node->right = upo_bst_delete_impl(node->right, key, key_cmp);
+        node->right = upo_bst_delete_impl(node->right, key, key_cmp, destroy_data);
     } else {
         if (node->left == NULL && node->right == NULL) {
-            free(node);
+            if(destroy_data == 1)free(node);
             return NULL;
         } else if (node->left != NULL && node->right != NULL) {
             // Node has two children
@@ -216,7 +216,7 @@ upo_bst_node_t* upo_bst_delete_impl(upo_bst_node_t *node, const void *key, upo_b
             }
             node->key = successor->key;
             node->value = successor->value;
-            node->right = upo_bst_delete_impl(node->right, successor->key, key_cmp);
+            node->right = upo_bst_delete_impl(node->right, successor->key, key_cmp, destroy_data);
         } else {
             // Node has one child
             upo_bst_node_t *temp = node;
@@ -237,7 +237,7 @@ void upo_bst_delete(upo_bst_t tree, const void *key, int destroy_data)
         return;
     }
 
-    tree->root = upo_bst_delete_impl(tree->root, key, tree->key_cmp);
+    tree->root = upo_bst_delete_impl(tree->root, key, tree->key_cmp, destroy_data);
 }
 
 size_t upo_bst_size_impl(upo_bst_node_t *tree){
