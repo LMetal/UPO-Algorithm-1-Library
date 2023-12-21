@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <upo/random.h>
 #include <upo/utility.h>
+#include <math.h>
 
 
 double upo_random_uniform_real(double lo, double hi)
@@ -32,7 +33,7 @@ double upo_random_uniform_real(double lo, double hi)
 
 int upo_random_uniform_int(int lo, int hi)
 {
-    return lo + rand()/(RAND_MAX+1.0)*(hi-lo);
+    return lo + (int)(fabs(rand()/(RAND_MAX+1.0)*(hi-lo)));
 }
 
 void upo_random_shuffle(void *base, size_t n, size_t size)
@@ -43,8 +44,8 @@ void upo_random_shuffle(void *base, size_t n, size_t size)
     assert( base != NULL );
 
     for (i = 0; i < n; ++i)
-    {   
-        size_t r = upo_random_uniform_int(i, n-i);
+    {
+        size_t r = (size_t)upo_random_uniform_int((int)i, (int)(n-i));
         if (i != r)
         {
             upo_swap(ptr+i*size, ptr+r*size, size);
@@ -58,7 +59,7 @@ char* upo_random_string(char *s, size_t n)
 
     for (; i < n; ++i)
     {
-        s[i] = upo_random_uniform_int(' ', '~');
+        s[i] = (char)upo_random_uniform_int(' ', '~');
     }
     s[n] = '\0';
 

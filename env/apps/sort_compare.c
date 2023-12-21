@@ -493,7 +493,7 @@ int main(int argc, char *argv[])
                 usage(argv[0]);
                 return EXIT_FAILURE;
             }
-            opt_n = atol(argv[arg]);
+            opt_n = (size_t)atol(argv[arg]);
         }
         else if (!strcmp("-r", argv[arg]))
         {
@@ -504,7 +504,7 @@ int main(int argc, char *argv[])
                 usage(argv[0]);
                 return EXIT_FAILURE;
             }
-            opt_num_runs = atol(argv[arg]);
+            opt_num_runs = (unsigned int)atol(argv[arg]);
         }
         else if (!strcmp("-s", argv[arg]))
         {
@@ -515,7 +515,7 @@ int main(int argc, char *argv[])
                 usage(argv[0]);
                 return EXIT_FAILURE;
             }
-            opt_seed = atoi(argv[arg]);
+            opt_seed = (unsigned int)atoi(argv[arg]);
         }
         else if (!strcmp("-v", argv[arg]))
         {

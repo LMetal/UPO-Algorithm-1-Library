@@ -81,7 +81,7 @@ int eval_postfix(const char *expr, long *res)
                   *c = *a % *b;
                   break;
               case '^':
-                  *c = pow(*a, *b);
+                  *c = (long)pow((double)*a, (double)*b);
                   break;
 
 

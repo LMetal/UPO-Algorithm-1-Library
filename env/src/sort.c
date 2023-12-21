@@ -39,7 +39,7 @@ void upo_insertion_sort(void *base, size_t n, size_t size, upo_sort_comparator_t
 {
     char * basePtr = (char*) base;
     for(size_t i=1; i<n; i++){
-        int j=i;
+        size_t j=i;
         while((j>0) && cmp((basePtr + (j-1)*size), (basePtr + j*size))>0){
             swap(basePtr + (j-1)*size, (basePtr + j*size), size);
             j--;
@@ -93,7 +93,7 @@ void upo_merge_sort(void *base, size_t n, size_t size, upo_sort_comparator_t cmp
     upo_merge((char*)base, n1, n2, size, cmp);
 }
 
-int partition(void *base, size_t n, size_t size, upo_sort_comparator_t cmp){
+int partition(void *base, size_t n, size_t size, ugipo_sort_comparator_t cmp){
     void *pivot = base;
     size_t pivotPos = 0;
     swap(base, (char*)base+n/2*size, size);
@@ -103,7 +103,7 @@ int partition(void *base, size_t n, size_t size, upo_sort_comparator_t cmp){
         }
     }
     swap(pivot, (char*)base+pivotPos*size, size);
-    return pivotPos;
+    return (int)pivotPos;
 }
 
 
@@ -111,9 +111,9 @@ void upo_quick_sort(void *base, size_t n, size_t size, upo_sort_comparator_t cmp
 {
 
   if(n <= 1) return;
-  int q = partition(base, n, size, cmp);
-  int n1 = q;
-  int n2 = n-q;
+  size_t q = (size_t)partition(base, n, size, cmp);
+  size_t n1 = q;
+  size_t n2 = n-q;
   upo_quick_sort(base, n1, size, cmp);
   upo_quick_sort((char*)base+q*size, n2, size, cmp);
 }
